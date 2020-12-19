@@ -1,7 +1,7 @@
 (ns advent.day1
   (:require [clojure.string]))
 
-(defn sum-to-2020-product
+(defn part1
   "Find the product of two numbers that sum to 2020"
   [input]
   (loop [complements #{}
@@ -10,3 +10,4 @@
       (if (contains? complements (- 2020 number))
         (* number (- 2020 number))
         (recur (conj complements number) (rest numbers))))))
+
