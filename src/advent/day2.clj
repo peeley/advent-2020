@@ -1,7 +1,7 @@
 (ns advent.day2
   (:require [clojure.string :as string]))
 
-(defn parse-rule
+(defn parse-line
   "Parse line of text into rule and password"
   [rule]
   (let [halves (string/split rule #":")
@@ -16,20 +16,41 @@
      :min min
      :max max}))
 
-(defn matches-rule?
-  "check if a given string matches a password rule"
-  [rule]
+(defn counts-valid?
+  "check if a given string has required amount of letter"
+  [line]
   (let [{password :password
          letter :letter
          min :min
-         max :max} rule
+         max :max} line
         matches (count (filter #(= % letter) password))]
     (and (>= matches min) (<= matches max))))
+
+(defn matches-rule?
+  [input policy]
+  (let [lines (string/split-lines input)]
+    (count (filter #(policy (parse-line %)) lines))))
 
 (defn part1
   "Count how many passwords match their policy"
   [input]
-  (let [lines (string/split-lines input)
-        rule (parse-rule (first lines))]
-    (count (filter #(matches-rule? (parse-rule %)) lines))))
+  (matches-rule? input counts-valid?))
 
+(defn xor
+  [a b]
+  (or (and a (not b)) (and (not a) b)))
+
+(defn positions-valid?
+  "check if letters in proper position according to rule"
+  [rule]
+  (let [{password :password
+         letter :letter
+         min :min
+         max :max} rule]
+    (xor
+     (= (nth password min) letter)
+     (= (nth password max) letter))))
+
+(defn part2
+  [input]
+  (matches-rule? input positions-valid?))
