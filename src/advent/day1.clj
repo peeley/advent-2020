@@ -6,8 +6,8 @@
   [input]
   (loop [complements #{}
          numbers (clojure.string/split-lines input)]
-    (let [number (Integer/parseInt (first numbers))]
-      (if (contains? complements (- 2020 number))
-        (* number (- 2020 number))
+    (let [number (Integer/parseInt (first numbers))
+          complement (- 2020 number)]
+      (if (contains? complements complement)
+        (* number complement)
         (recur (conj complements number) (rest numbers))))))
-
