@@ -44,9 +44,28 @@
        (* 8
           (get-row-number row-partitions)))))
 
+(defn convert-input-to-seat-numbers
+  [input-string]
+  (map
+    get-seat-number
+    (str/split-lines input-string)))
+
 (defn part1
   [input-string]
   (apply max
-   (map
-    get-seat-number
-    (str/split-lines input-string))))
+   (convert-input-to-seat-numbers input-string)))
+
+(defn seat-is-after-gap?
+  [last-seat this-seat]
+  (< 1 (- this-seat last-seat)))
+
+(defn part2
+  [input-string]
+  (let [seat-numbers (convert-input-to-seat-numbers input-string)
+        sorted-seat-numbers (sort seat-numbers)]
+    (loop [seats sorted-seat-numbers
+           last-seat-checked Integer/MAX_VALUE]
+      (let [this-seat (first seats)]
+        (if (seat-is-after-gap? last-seat-checked this-seat)
+          (- this-seat 1)
+          (recur (rest seats) this-seat))))))
