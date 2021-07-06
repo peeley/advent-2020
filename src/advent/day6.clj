@@ -24,9 +24,31 @@
   (let [groups (str/split input #"\n\n")]
     (apply + (map num-yeses-in-group groups))))
 
-(comment
-  (def input (slurp "test/advent/day6/input"))
-  (get-answers-from-person "abc" #{})
-  (num-yeses-in-group "ab\nac")
-  (part1 input)
-  )
+(defn num-people-in-group
+  [group]
+  (count (str/split-lines group)))
+
+(defn insert-answer-into-occurence-map
+  [answer-map answer-char]
+  (let [occurence (get answer-map answer-char 0)]
+    (conj answer-map {answer-char (+ 1 occurence)})))
+
+(defn insert-answer-line-into-occurence-map
+  [answer-map answer-line]
+  (reduce insert-answer-into-occurence-map answer-map answer-line))
+
+(defn get-answer-occurences-from-group
+  [group]
+  (let [individual-answers (str/split-lines group)]
+    (reduce insert-answer-line-into-occurence-map {} individual-answers)))
+
+(defn get-number-of-unanimous-answers-from-group
+  [group]
+  (let [num-people (num-people-in-group group)
+        answer-occurences (get-answer-occurences-from-group group)]
+    (count (filter #(= (second %) num-people) answer-occurences))))
+
+(defn part2
+  [input]
+  (let [groups (str/split input #"\n\n")]
+    (apply + (map get-number-of-unanimous-answers-from-group groups))))
