@@ -6,20 +6,45 @@
   [str]
   (second (str/split str #"[0-9] ")))
 
+(defn separate-number-from-bag-color
+  [str]
+  (Integer/parseInt (re-find #"\d+" str)))
+
+(defn extract-color-and-number
+  [str]
+  (if (.contains str "no other")
+    []
+    (let [color (separate-bag-color-from-number str)
+          number (separate-number-from-bag-color str)]
+      [number color])))
+
 (defn parse-input-line
   [line]
   (let [[outer-bag inner-bags-str] (str/split line #" bags contain ")
         inner-bags-list (map separate-bag-color-from-number (str/split inner-bags-str #" bag[s]?[,.]"))]
     {outer-bag (set inner-bags-list)}))
 
+(defn parse-input-line-with-number
+  [line]
+  (let [[outer-bag inner-bags-str] (str/split line #" bags contain ")
+        inner-bags-list (map extract-color-and-number (str/split inner-bags-str #" bag[s]?[,.]"))]
+    {outer-bag inner-bags-list}))
+
 (defn parse-input-to-graph
   [input]
   (let [input-lines (str/split-lines input)]
     (apply merge (map #(parse-input-line %) input-lines))))
 
+(defn parse-input-to-weighted-graph
+  [input]
+  (let [input-lines (str/split-lines input)]
+    (apply merge (map #(parse-input-line-with-number %) input-lines))))
+
 (def input (slurp "test/advent/day7/input"))
 
 (def graph (parse-input-to-graph input))
+
+(def weighted-graph (parse-input-to-weighted-graph input))
 
 (defn get-color-sub-bags
   [color]
@@ -50,3 +75,20 @@
     (count
      (apply set/union
        (map #(get-bags-containing-color % "shiny gold" #{}) (keys graph))))))
+
+(defn count-number-of-bags
+  [bag-tuple]
+  (if (= bag-tuple [])
+    0
+    (let [[number color] bag-tuple]
+      (+ number (* number (get-total-number-of-bags-inside color))))))
+
+(defn get-total-number-of-bags-inside
+  [outer-color]
+  (if (bag-is-empty? outer-color)
+    1
+    (let [inner-bags (get weighted-graph outer-color)]
+      (apply +
+        (map
+          #(count-number-of-bags %)
+          inner-bags)))))
