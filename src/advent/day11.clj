@@ -10,7 +10,7 @@
 
 (defn get-seat-at
   [[y x] seats]
-  (nth (nth seats y nil) x nil))
+  (get (get seats y) x))
 
 (defn seat-is-occupied?
   [seat-location seats]
@@ -49,10 +49,11 @@
   [seats-state]
   (let [height (count seats-state)
         width (count (first seats-state))]
-    (partition width
-               (for [y (range 0 height)
-                     x (range 0 width)]
-                 (update-seat [y x] seats-state)))))
+    (mapv vec
+          (partition width
+                     (for [y (range 0 height)
+                           x (range 0 width)]
+                       (update-seat [y x] seats-state))))))
 
 (defn count-total-occupied
   [seats]
