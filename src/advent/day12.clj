@@ -29,5 +29,5 @@
                 (map parse-action)))
 (defn part1
   []
-  (let [[x y _](reduce perform-action [0 0 0] input)]
+  (let [[x y _] (reduce perform-action [0 0 0] input)]
     (+ (Math/abs x) (Math/abs y))))
