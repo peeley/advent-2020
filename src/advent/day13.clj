@@ -29,3 +29,4 @@
   (as-> bus-ids $
     (map #(vec [% (get-bus-wait-time arrival-time %)]) $)
     (reduce compare-wait-times [0 Integer/MAX_VALUE] $)
+    (apply * $)))
