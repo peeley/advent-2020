@@ -76,6 +76,8 @@
      (apply set/union
        (map #(get-bags-containing-color % "shiny gold" #{}) (keys graph))))))
 
+(declare get-total-number-of-bags-inside)
+
 (defn count-number-of-bags
   [bag-tuple]
   (if (= bag-tuple [])
