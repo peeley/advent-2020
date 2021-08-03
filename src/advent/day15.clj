@@ -7,26 +7,18 @@
 
 (defn part1
   [input]
-  (loop [ages (into {} (map-indexed #(into [] [(str %2) (inc %1)]) input))
-         turn (inc (count input))
+  (loop [new-numbers {}
+         previous-numbers (into {} (map-indexed #(vector %2 %1) input))
+         turn (count input)
          last-number (last input)]
-    (if (= turn 2021)
+    (if (= turn 2020)
       last-number
-      (let [last-turn-spoken (ages (str last-number))
-            new-number (if (nil? last-turn-spoken)
-                         0
-                         (- turn last-turn-spoken))
-            new-ages (assoc ages (str new-number) turn)]
-        (recur new-ages (inc turn) new-number)))))
-
-(comment
-  (part1 input)
-
-  (def ages (into {} (map-indexed #(into [] [(str %2) (inc %1)]) input)))
-  (def last-number (last input))
-  (def turn (inc (count input)))
-  (ages (str last-number))
-  (def new-number (- (inc (count input)) (ages (str last-number))))
-  (assoc ages (str new-number) turn)
-  (ages "9")
-  )
+      (let [new-number (if (and (new-numbers last-number)
+                                (previous-numbers last-number))
+                         (- (previous-numbers last-number)
+                            (new-numbers last-number))
+                         0)]
+        (recur (assoc new-numbers new-number (previous-numbers new-number))
+               (assoc previous-numbers new-number turn)
+               (inc turn)
+               new-number)))))
