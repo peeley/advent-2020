@@ -5,13 +5,13 @@
                 (str/split $ #",")
                 (map #(Integer/parseInt %) $)))
 
-(defn part1
-  [input]
+(defn find-nth-number-spoken
+  [starting-nums n]
   (loop [new-numbers {}
-         previous-numbers (into {} (map-indexed #(vector %2 %1) input))
-         turn (count input)
-         last-number (last input)]
-    (if (= turn 2020)
+         previous-numbers (into {} (map-indexed #(vector %2 %1) starting-nums))
+         turn (count starting-nums)
+         last-number (last starting-nums)]
+    (if (= turn n)
       last-number
       (let [new-number (if (and (new-numbers last-number)
                                 (previous-numbers last-number))
@@ -22,3 +22,11 @@
                (assoc previous-numbers new-number turn)
                (inc turn)
                new-number)))))
+
+(defn part1
+  [input]
+  (find-nth-number-spoken input 2020))
+
+(defn part2
+  [input]
+  (find-nth-number-spoken input 30000000))
