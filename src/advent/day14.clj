@@ -4,15 +4,15 @@
 (defn parse-mask-to-map
   [mask-str]
   (into {} (for [idx (range 0 (count mask-str))
-                 :let [bit (nth (reverse mask-str) idx)]
-                 :when (not= bit \X)]
+                 :let [bit (nth (reverse mask-str) idx)]]
              [idx bit])))
 
 (defn modify-bit
   [index bit-state number]
   (case bit-state
     \0 (bit-clear number index)
-    \1 (bit-set number index)))
+    \1 (bit-set number index)
+    \X number))
 
 (defn mask-value
   [mask value]
@@ -47,7 +47,7 @@
                 (map parse-command)))
 
 (defn process-commands
-  [commands]
+  [commands modify-fn]
   (loop [commands commands
          mem-cells {}
          mask 0]
@@ -57,7 +57,7 @@
             rest-commands (rest commands)]
         (case (:type this-command)
           :mem-insert (recur rest-commands
-                             (modify-memory
+                             (modify-fn
                               (:index this-command)
                               (:val this-command)
                               mask
@@ -67,5 +67,31 @@
 
 (defn part1
   [input]
-  (let [mem-cells (process-commands input)]
+  (let [mem-cells (process-commands input modify-memory)]
+    (reduce-kv #(+ %1 %3) 0 mem-cells)))
+
+(part1 input)
+
+(defn apply-mask-bit-to-addresses
+  [addresses bit-idx bit]
+  (case bit
+    \0 addresses
+    \1 (map #(bit-set % bit-idx) addresses)
+    \X (->> addresses
+            (map #(vector (bit-clear % bit-idx) (bit-set % bit-idx)))
+            flatten)))
+
+(defn get-address-variations
+  [mask address]
+  (let [addresses [address]]
+    (reduce-kv apply-mask-bit-to-addresses addresses mask)))
+
+(defn insert-at-all-variations
+  [address value mask mem-cells]
+  (let [variations (get-address-variations mask address)]
+    (reduce #(assoc %1 %2 value) mem-cells variations)))
+
+(defn part2
+  [input]
+  (let [mem-cells (process-commands input insert-at-all-variations)]
     (reduce-kv #(+ %1 %3) 0 mem-cells)))
