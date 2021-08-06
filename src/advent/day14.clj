@@ -70,8 +70,6 @@
   (let [mem-cells (process-commands input modify-memory)]
     (reduce-kv #(+ %1 %3) 0 mem-cells)))
 
-(part1 input)
-
 (defn apply-mask-bit-to-addresses
   [addresses bit-idx bit]
   (case bit
